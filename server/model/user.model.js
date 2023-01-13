@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import JWT from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import config from "../config/index.js";
 import role from "../util/authRole.js";
 
