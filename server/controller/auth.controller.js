@@ -1,6 +1,8 @@
 import User from "../model/user.model.js";
 import asyncHandler from "../service/asyncHandler.js";
-import role from "../util/authRole.js";
+import AuthRole from "../util/authRole.js";
+import { options } from "../config/cookieOptions.js";
+
 import {
 	CustomError,
 	PropertyRequiredError,
@@ -19,6 +21,44 @@ import {
 export const home = (_req, res) => {
 	res.status(204).send("api auth home");
 };
+
+/**************************************************
+ * @LOGIN
+ * @REQUEST_TYPE POST
+ * @route http://localhost:<PORT>/api/auth/login
+ * @description Login a user
+ * @parameters email, password
+ * @returns User
+ **************************************************/
+
+export const login = asyncHandler(async (req, res) => {
+	const { password, email } = req.body;
+	if (!(email && password)) {
+		throw new PropertyRequiredError("Email and Password");
+	}
+
+	const user = await User.findOne({ email }).select("+password");
+	if (!user) {
+		throw new CustomError("Invalid Credentials", 403);
+	}
+
+	const isPasswordMatched = await user.comparePassword(password);
+
+	if (!isPasswordMatched) {
+		throw new CustomError("Invalid Credentials", 403);
+	}
+
+	user.password = undefined;
+
+	const token = await user.getJwtToken();
+
+	res.cookie("token", token, options);
+
+	res.status(201).json({
+		success: true,
+		user,
+	});
+});
 
 /**************************************************
  * @SIGNUP
@@ -44,7 +84,7 @@ export const signup = asyncHandler(async (req, res) => {
 		name,
 		email,
 		password,
-		role: role || role.USER,
+		role: role || AuthRole.USER,
 	});
 
 	if (!user) {
@@ -53,8 +93,26 @@ export const signup = asyncHandler(async (req, res) => {
 
 	user.password = undefined;
 
+	const token = await user.getJwtToken();
+
+	res.cookie("token", token, options);
+
 	res.status(201).json({
 		success: true,
 		user,
 	});
+});
+
+/**************************************************
+ * @PROFILE
+ * @REQUEST_TYPE GET
+ * @route http://localhost:<PORT>/api/auth/profile
+ * @description Profile page for user
+ * @parameters
+ * @returns User
+ **************************************************/
+
+export const profile = asyncHandler(async (req, res) => {
+	const { user } = req;
+	res.status(200).json(user);
 });
