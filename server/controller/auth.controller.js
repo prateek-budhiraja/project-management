@@ -2,7 +2,6 @@ import User from "../model/user.model.js";
 import asyncHandler from "../service/asyncHandler.js";
 import AuthRole from "../util/authRole.js";
 import { options } from "../config/cookieOptions.js";
-
 import {
 	CustomError,
 	PropertyRequiredError,
@@ -115,4 +114,42 @@ export const signup = asyncHandler(async (req, res) => {
 export const profile = asyncHandler(async (req, res) => {
 	const { user } = req;
 	res.status(200).json(user);
+});
+
+/**************************************************
+ * @UPDATE_ROLE
+ * @REQUEST_TYPE PATCH
+ * @route http://localhost:<PORT>/api/auth/update/<UID>
+ * @description Update User account
+ * @parameters name, email, password, role
+ * @returns User
+ **************************************************/
+
+export const updateRole = asyncHandler(async (req, res) => {
+	const { uid } = req.params;
+	if (!uid) {
+		throw new PropertyRequiredError("User ID");
+	}
+
+	const { role } = req.body;
+	if (!role) {
+		throw new PropertyRequiredError("Role");
+	}
+
+	const updatedUser = await User.findByIdAndUpdate(
+		uid,
+		{
+			role,
+		},
+		{ new: true, runValidators: true }
+	);
+
+	if (!updatedUser) {
+		throw new UnexpectedError("Unable to update role");
+	}
+
+	res.status(201).json({
+		success: true,
+		user: updatedUser,
+	});
 });
