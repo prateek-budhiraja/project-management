@@ -66,17 +66,18 @@ export const addTask = asyncHander(async (req, res) => {
 		status: TaskStatus.PENDING,
 	};
 
-	if (req.user?.role === AuthRole.ADMIN || req.user?.role === AuthRole.LEAD) {
+	if (
+		req.user?.role === AuthRole.ADMIN ||
+		JSON.stringify(req.user?._id) === JSON.stringify(req.project?.lead)
+	) {
 		task.status = TaskStatus.APPROVED;
 	}
 
-	const project = await Project.findByIdAndUpdate(
-		req.params.pid,
-		{
-			$push: { tasks: task },
-		},
-		{ new: true }
-	);
+	req.project.tasks.push(task);
+
+	const { project } = req;
+
+	await project.save();
 
 	if (!project) {
 		throw new UnexpectedError("Unable to add task");
