@@ -43,3 +43,15 @@ export const isAdmin = (req, res, next) => {
 		});
 	}
 };
+
+// checks if the loggedin user is a lead
+export const isLead = (req, res, next) => {
+	if (req.user?.role === AuthRole.ADMIN || req.user?.role === AuthRole.LEAD) {
+		next();
+	} else {
+		res.status(403).json({
+			success: false,
+			message: "Not authorized to access this route",
+		});
+	}
+};
