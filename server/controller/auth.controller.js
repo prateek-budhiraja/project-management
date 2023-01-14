@@ -120,8 +120,8 @@ export const profile = asyncHandler(async (req, res) => {
  * @UPDATE_ROLE
  * @REQUEST_TYPE PATCH
  * @route http://localhost:<PORT>/api/auth/update/<UID>
- * @description Update User account
- * @parameters name, email, password, role
+ * @description Update User role
+ * @parameters uid, role
  * @returns User
  **************************************************/
 
@@ -151,5 +151,32 @@ export const updateRole = asyncHandler(async (req, res) => {
 	res.status(201).json({
 		success: true,
 		user: updatedUser,
+	});
+});
+
+/**************************************************
+ * @DELETE_USER
+ * @REQUEST_TYPE DELETE
+ * @route http://localhost:<PORT>/api/auth/delete/<UID>
+ * @description Delete role
+ * @parameters uid
+ * @returns Message
+ **************************************************/
+
+export const deleteUser = asyncHandler(async (req, res) => {
+	const { uid } = req.params;
+	if (!uid) {
+		throw new PropertyRequiredError("User ID");
+	}
+
+	const deletedUser = await User.findByIdAndDelete(uid);
+
+	if (!deletedUser) {
+		throw new UnexpectedError("Unable to delete user");
+	}
+
+	res.status(200).json({
+		success: true,
+		message: "User is deleted",
 	});
 });

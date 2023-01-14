@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+	deleteUser,
 	home,
 	login,
 	profile,
@@ -13,6 +14,7 @@ router.get("/", home);
 router.post("/signup", isLoggedIn, isAdmin, signup);
 router.post("/login", login);
 router.get("/profile", isLoggedIn, profile);
-router.patch("/updaterole/:uid", updateRole);
+router.patch("/update/:uid", isLoggedIn, isAdmin, updateRole);
+router.delete("/delete/:uid", isLoggedIn, isAdmin, deleteUser);
 
 export { router };
