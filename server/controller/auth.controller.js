@@ -180,3 +180,25 @@ export const deleteUser = asyncHandler(async (req, res) => {
 		message: "User is deleted",
 	});
 });
+
+/**************************************************
+ * @LOGOUT
+ * @REQUEST_TYPE POST
+ * @route http://localhost:<PORT>/api/auth/logout
+ * @description Logout user
+ * @parameters
+ * @returns Message
+ **************************************************/
+
+export const logout = (req, res) => {
+	req.user = undefined;
+	res.cookie("token", null, {
+		httpOnly: true,
+		expires: new Date(Date.now()),
+	});
+
+	res.status(200).json({
+		success: true,
+		message: "User logged out successfully",
+	});
+};

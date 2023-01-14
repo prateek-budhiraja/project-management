@@ -3,6 +3,7 @@ import {
 	deleteUser,
 	home,
 	login,
+	logout,
 	profile,
 	signup,
 	updateRole,
@@ -16,5 +17,6 @@ router.post("/login", login);
 router.get("/profile", isLoggedIn, profile);
 router.patch("/update/:uid", isLoggedIn, isAdmin, updateRole);
 router.delete("/delete/:uid", isLoggedIn, isAdmin, deleteUser);
+router.post("/logout", isLoggedIn, logout);
 
 export { router };
