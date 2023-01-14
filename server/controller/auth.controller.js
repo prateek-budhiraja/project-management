@@ -202,3 +202,53 @@ export const logout = (req, res) => {
 		message: "User logged out successfully",
 	});
 };
+
+/**************************************************
+ * @GET_ALL_USERS
+ * @REQUEST_TYPE GET
+ * @route http://localhost:<PORT>/api/auth/users
+ * @description Logout user
+ * @parameters
+ * @returns Message
+ **************************************************/
+
+export const users = asyncHandler(async (_req, res) => {
+	const users = await User.find();
+	if (!users) {
+		throw new UnexpectedError("Unable to fetch user data");
+	}
+	res.status(200).json({
+		success: true,
+		users,
+	});
+});
+
+/**************************************************
+ * @UPDATE_PASSWORD
+ * @REQUEST_TYPE Patch
+ * @route http://localhost:<PORT>/api/auth/update/password/<UID>
+ * @description Update user password
+ * @parameters uid, password
+ * @returns Success message
+ **************************************************/
+
+export const updatePassword = asyncHandler(async (req, res) => {
+	const { uid } = req.params;
+	if (!uid) {
+		throw new PropertyRequiredError("User ID");
+	}
+
+	const { password } = req.body;
+
+	const user = await User.findById(uid).select("+password");
+	if (!user) {
+		throw new UnexpectedError("Unable to change password");
+	}
+	user.password = password;
+	await user.save();
+
+	res.status(200).json({
+		success: true,
+		message: "Password updated successfully",
+	});
+});
