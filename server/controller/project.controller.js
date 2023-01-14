@@ -2,7 +2,11 @@ import Project from "../model/project.model.js";
 import User from "../model/user.model.js";
 import asyncHander from "../service/asyncHandler.js";
 import AuthRole from "../util/authRole.js";
-import { PropertyRequiredError, UnexpectedError } from "../util/customError.js";
+import {
+	CustomError,
+	PropertyRequiredError,
+	UnexpectedError,
+} from "../util/customError.js";
 import { TaskStatus } from "../util/status.js";
 
 /**************************************************
@@ -86,5 +90,58 @@ export const addTask = asyncHander(async (req, res) => {
 	res.status(201).json({
 		success: true,
 		project,
+	});
+});
+
+/**************************************************
+ * @ASSIGN_TASK
+ * @REQUEST_TYPE PATCH
+ * @route http://localhost:4000/api/project/task/:tid/assign
+ * @description Assign task to a user
+ * @parameters email
+ * @returns Task
+ **************************************************/
+
+/**************************************************
+ * @GET_PROJECTS
+ * @REQUEST_TYPE GET
+ * @route http://localhost:4000/api/projects
+ * @description Get own tasks (User), Get own projects (lead), Get all projects (admin)
+ * @parameters
+ * @returns Task
+ **************************************************/
+
+export const getProjects = asyncHander(async (req, res) => {
+	const projects = await Project.find();
+
+	if (!projects) {
+		throw new UnexpectedError("Unable to fetch projects");
+	}
+
+	let result;
+
+	if (req.user?.role === AuthRole.ADMIN) {
+		result = projects;
+	} else if (req.user?.role === AuthRole.LEAD) {
+		result = projects.filter(
+			(project) =>
+				JSON.stringify(project.lead) === JSON.stringify(req.user?._id)
+		);
+	} else if (req.user?.role === AuthRole.USER) {
+		result = projects
+			.map((project) => {
+				project.tasks = project.tasks.filter(
+					(task) =>
+						JSON.stringify(task.assigned_to) === JSON.stringify(req.user?._id)
+				);
+				if (project.tasks.length) {
+					return project;
+				}
+			})
+			.filter(Boolean);
+	}
+	res.json({
+		success: true,
+		projects: result,
 	});
 });
