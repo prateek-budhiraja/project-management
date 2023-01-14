@@ -1,5 +1,7 @@
 import Project from "../model/project.model.js";
 import User from "../model/user.model.js";
+import asyncHander from "../service/asyncHandler.js";
+import { PropertyRequiredError } from "../util/customError.js";
 
 /**************************************************
  * @HOME
@@ -17,28 +19,26 @@ export const home = (_req, res) => {
 /**************************************************
  * @CREATE_PROJECT
  * @REQUEST_TYPE POST
- * @route http://localhost:4000/api/projects/create
+ * @route http://localhost:4000/api/project/create
  * @description Create new project (only by lead)
- * @parameters project_name
+ * @parameters name
  * @returns Project
  **************************************************/
 
-export const createProject = async (req, res) => {
+export const createProject = asyncHander(async (req, res) => {
 	const { name } = req.body;
 
-	const lead = await User.create({
-		name: "Prateek",
-		email: "prateek@gmail.com",
-		password: "prateek",
-	});
+	if (!name) {
+		throw new PropertyRequiredError("Project name");
+	}
 
 	const project = await Project.create({
 		name,
-		lead,
+		lead: req.user,
 	});
 
-	res.status(200).json({
+	res.status(201).json({
 		success: true,
 		project,
 	});
-};
+});
