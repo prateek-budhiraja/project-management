@@ -96,7 +96,7 @@ export const addTask = asyncHander(async (req, res) => {
 /**************************************************
  * @ASSIGN_TASK
  * @REQUEST_TYPE PATCH
- * @route http://localhost:<PORT>/api/project/task/:tid/assign
+ * @route http://localhost:<PORT>/api/task/:tid/assign
  * @description Assign task to a user
  * @parameters email
  * @returns Project
@@ -153,10 +153,18 @@ export const getProjects = asyncHander(async (req, res) => {
 	if (req.user?.role === AuthRole.ADMIN) {
 		result = projects;
 	} else if (req.user?.role === AuthRole.LEAD) {
-		result = projects.filter(
-			(project) =>
-				JSON.stringify(project.lead) === JSON.stringify(req.user?._id)
-		);
+		result = projects.filter((project) => {
+			if (JSON.stringify(project.lead) === JSON.stringify(req.user?._id)) {
+				return project;
+			}
+			project.tasks = project.tasks.filter(
+				(task) =>
+					JSON.stringify(task.assigned_to) === JSON.stringify(req.user?._id)
+			);
+			if (project.tasks.length) {
+				return project;
+			}
+		});
 	} else if (req.user?.role === AuthRole.USER) {
 		result = projects
 			.map((project) => {
@@ -179,7 +187,7 @@ export const getProjects = asyncHander(async (req, res) => {
 /**************************************************
  * @CHANGE_TASK_STATUS
  * @REQUEST_TYPE PATCH
- * @route http://localhost:<PORT>/api/project/task/:tid/status
+ * @route http://localhost:<PORT>/api/task/:tid/status
  * @description Change task status (only by assigned user)
  * @parameters status
  * @returns Project
@@ -254,6 +262,47 @@ export const changeProjectName = asyncHander(async (req, res) => {
 	}
 
 	project.name = name;
+	await project.save();
+
+	res.status(200).json({
+		success: true,
+		project,
+	});
+});
+
+/**************************************************
+ * @APPROVE_TASK
+ * @REQUEST_TYPE PATCH
+ * @route http://localhost:<PORT>/api/task/:tid/approve
+ * @description Approve
+ * @parameters
+ * @returns Project
+ **************************************************/
+
+export const approveTask = asyncHander(async (req, res) => {
+	const project = await Project.findOne({ "tasks._id": req.params?.tid });
+	if (!project) {
+		throw new UnexpectedError("Unable to approve task");
+	}
+
+	if (
+		!(
+			req.user?.role === AuthRole.ADMIN ||
+			JSON.stringify(project.lead) === JSON.stringify(req.user?._id)
+		)
+	) {
+		throw new CustomError("Not authorized to approve task", 401);
+	}
+
+	project.tasks.forEach((task) => {
+		if (
+			JSON.stringify(task._id) === JSON.stringify(req.params?.tid) &&
+			task.status === TaskStatus.PENDING
+		) {
+			task.status = TaskStatus.APPROVED;
+		}
+	});
+
 	await project.save();
 
 	res.status(200).json({
