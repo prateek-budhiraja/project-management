@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
 	addTask,
+	approveTask,
 	assignTask,
 	changeProjectName,
 	changeTaskStatus,
@@ -13,11 +14,15 @@ import { setProject } from "../middleware/project.middleware.js";
 const router = Router();
 
 router.get("/", home);
+
 router.post("/project/create", isLoggedIn, isLead, createProject);
 router.patch("/project/:pid/task/add", isLoggedIn, setProject, addTask);
-router.get("/projects", isLoggedIn, getProjects);
-router.patch("/project/task/:tid/assign", isLoggedIn, isLead, assignTask);
-router.patch("/project/task/:tid/status", isLoggedIn, changeTaskStatus);
 router.patch("/project/:pid/name/edit", isLoggedIn, isLead, changeProjectName);
+
+router.patch("/task/:tid/status", isLoggedIn, changeTaskStatus);
+router.patch("/task/:tid/assign", isLoggedIn, isLead, assignTask);
+router.patch("/task/:tid/approve", isLoggedIn, approveTask);
+
+router.get("/projects", isLoggedIn, getProjects);
 
 export { router };
