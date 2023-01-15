@@ -12,7 +12,7 @@ import { TaskStatus } from "../util/status.js";
 /**************************************************
  * @HOME
  * @REQUEST_TYPE GET
- * @route http://localhost:4000/api/home
+ * @route http://localhost:<PORT>/api/home
  * @description Home route for API
  * @parameters
  * @returns
@@ -25,7 +25,7 @@ export const home = (_req, res) => {
 /**************************************************
  * @CREATE_PROJECT
  * @REQUEST_TYPE POST
- * @route http://localhost:4000/api/project/create
+ * @route http://localhost:<PORT>/api/project/create
  * @description Create new project (only by lead)
  * @parameters name
  * @returns Project
@@ -52,7 +52,7 @@ export const createProject = asyncHander(async (req, res) => {
 /**************************************************
  * @ADD_TASK
  * @REQUEST_TYPE PATCH
- * @route http://localhost:4000/api/project/:pid/task/add
+ * @route http://localhost:<PORT>/api/project/:pid/task/add
  * @description Add a new task
  * @parameters name
  * @returns Project
@@ -96,11 +96,41 @@ export const addTask = asyncHander(async (req, res) => {
 /**************************************************
  * @ASSIGN_TASK
  * @REQUEST_TYPE PATCH
- * @route http://localhost:4000/api/project/task/:tid/assign
+ * @route http://localhost:<PORT>/api/project/task/:tid/assign
  * @description Assign task to a user
  * @parameters email
- * @returns Task
+ * @returns Project
  **************************************************/
+
+export const assignTask = asyncHander(async (req, res) => {
+	const { email } = req.body;
+	if (!email) {
+		throw new PropertyRequiredError("Email");
+	}
+
+	const assigned_to = await User.findOne({ email });
+	if (!assigned_to) {
+		throw new UnexpectedError("Unable to fetch user with email");
+	}
+
+	const project = await Project.findOne({ "tasks._id": req.params.tid });
+	if (!project) {
+		throw UnexpectedError("Unable to fetch Project");
+	}
+
+	project.tasks.forEach((task) => {
+		if (JSON.stringify(task._id) === JSON.stringify(req.params.tid)) {
+			task.assigned_to = assigned_to;
+		}
+	});
+
+	await project.save();
+
+	res.status(200).json({
+		success: true,
+		project,
+	});
+});
 
 /**************************************************
  * @GET_PROJECTS
