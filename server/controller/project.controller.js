@@ -223,3 +223,41 @@ export const changeTaskStatus = asyncHander(async (req, res) => {
 		project,
 	});
 });
+
+/**************************************************
+ * @CHANGE_PROJECT_NAME
+ * @REQUEST_TYPE PATCH
+ * @route http://localhost:<PORT>/api/project/:pid/name/edit
+ * @description Change project name
+ * @parameters name
+ * @returns Project
+ **************************************************/
+
+export const changeProjectName = asyncHander(async (req, res) => {
+	const { name } = req.body;
+	if (!name) {
+		throw new PropertyRequiredError("Project name");
+	}
+
+	const project = await Project.findById(req.params?.pid);
+	if (!project) {
+		throw new UnexpectedError("Unable to edit project name");
+	}
+
+	if (
+		!(
+			req.user?.role === AuthRole.ADMIN ||
+			JSON.stringify(project.lead) === JSON.stringify(req.user?._id)
+		)
+	) {
+		throw new CustomError("Not allowed to edit name");
+	}
+
+	project.name = name;
+	await project.save();
+
+	res.status(200).json({
+		success: true,
+		project,
+	});
+});

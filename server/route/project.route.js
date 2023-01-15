@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
 	addTask,
 	assignTask,
+	changeProjectName,
 	changeTaskStatus,
 	createProject,
 	getProjects,
@@ -17,5 +18,6 @@ router.patch("/project/:pid/task/add", isLoggedIn, setProject, addTask);
 router.get("/projects", isLoggedIn, getProjects);
 router.patch("/project/task/:tid/assign", isLoggedIn, isLead, assignTask);
 router.patch("/project/task/:tid/status", isLoggedIn, changeTaskStatus);
+router.patch("/project/:pid/name/edit", isLoggedIn, isLead, changeProjectName);
 
 export { router };
