@@ -274,7 +274,7 @@ export const changeProjectName = asyncHander(async (req, res) => {
  * @APPROVE_TASK
  * @REQUEST_TYPE PATCH
  * @route http://localhost:<PORT>/api/task/:tid/approve
- * @description Approve
+ * @description Approve a task
  * @parameters
  * @returns Project
  **************************************************/
@@ -304,6 +304,43 @@ export const approveTask = asyncHander(async (req, res) => {
 	});
 
 	await project.save();
+
+	res.status(200).json({
+		success: true,
+		project,
+	});
+});
+
+/**************************************************
+ * @CHANGE_LEAD
+ * @REQUEST_TYPE PATCH
+ * @route http://localhost:<PORT>/api/project/:pid/lead/edit
+ * @description Change project lead
+ * @parameters email
+ * @returns Project
+ **************************************************/
+
+export const changeLead = asyncHander(async (req, res) => {
+	const { email } = req.body;
+	if (!email) {
+		throw new PropertyRequiredError("Lead Email");
+	}
+
+	const lead = await User.findOne({ email });
+	if (!lead || (lead.role !== AuthRole.LEAD && lead.role !== AuthRole.ADMIN)) {
+		throw new UnexpectedError("Unable to set new lead - role");
+	}
+
+	const project = await Project.findByIdAndUpdate(
+		req.params?.pid,
+		{
+			lead,
+		},
+		{ new: true }
+	);
+	if (!project) {
+		throw new UnexpectedError("Unable to set new lead");
+	}
 
 	res.status(200).json({
 		success: true,
