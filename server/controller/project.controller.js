@@ -138,7 +138,7 @@ export const assignTask = asyncHander(async (req, res) => {
  * @route http://localhost:4000/api/projects
  * @description Get own tasks (User), Get own projects (lead), Get all projects (admin)
  * @parameters
- * @returns Task
+ * @returns Projects
  **************************************************/
 
 export const getProjects = asyncHander(async (req, res) => {
@@ -173,5 +173,53 @@ export const getProjects = asyncHander(async (req, res) => {
 	res.json({
 		success: true,
 		projects: result,
+	});
+});
+
+/**************************************************
+ * @CHANGE_TASK_STATUS
+ * @REQUEST_TYPE PATCH
+ * @route http://localhost:<PORT>/api/project/task/:tid/status
+ * @description Change task status (only by assigned user)
+ * @parameters status
+ * @returns Project
+ **************************************************/
+
+export const changeTaskStatus = asyncHander(async (req, res) => {
+	const { status } = req.body;
+	if (!status) {
+		throw new PropertyRequiredError("Task Status");
+	}
+
+	const project = await Project.findOne({ "tasks._id": req.params.tid });
+	if (!project) {
+		throw new UnexpectedError("Unable to fetch project/task details");
+	}
+
+	let modified = false;
+
+	project.tasks.forEach((task) => {
+		// console.log(
+		// 	JSON.stringify(task.assigned_to) === JSON.stringify(req.user._id) &&
+		// 		JSON.stringify(req.params.tid) === JSON.stringify(task._id)
+		// );
+		if (
+			JSON.stringify(task.assigned_to) === JSON.stringify(req.user?._id) &&
+			JSON.stringify(req.params?.tid) === JSON.stringify(task._id)
+		) {
+			task.status = status;
+			modified = true;
+		}
+	});
+
+	if (!modified) {
+		throw new CustomError("Unable to modify status", 401);
+	}
+
+	await project.save();
+
+	res.status(200).json({
+		success: true,
+		project,
 	});
 });
