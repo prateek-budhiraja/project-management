@@ -113,10 +113,7 @@ export const assignTask = asyncHander(async (req, res) => {
 		throw new UnexpectedError("Unable to fetch user with email");
 	}
 
-	const project = await Project.findOne({ "tasks._id": req.params.tid });
-	if (!project) {
-		throw UnexpectedError("Unable to fetch Project");
-	}
+	const { project } = req;
 
 	project.tasks.forEach((task) => {
 		if (JSON.stringify(task._id) === JSON.stringify(req.params.tid)) {
@@ -199,10 +196,7 @@ export const changeTaskStatus = asyncHander(async (req, res) => {
 		throw new PropertyRequiredError("Task Status");
 	}
 
-	const project = await Project.findOne({ "tasks._id": req.params.tid });
-	if (!project) {
-		throw new UnexpectedError("Unable to fetch project/task details");
-	}
+	const { project } = req;
 
 	let modified = false;
 
@@ -247,19 +241,7 @@ export const changeProjectName = asyncHander(async (req, res) => {
 		throw new PropertyRequiredError("Project name");
 	}
 
-	const project = await Project.findById(req.params?.pid);
-	if (!project) {
-		throw new UnexpectedError("Unable to edit project name");
-	}
-
-	if (
-		!(
-			req.user?.role === AuthRole.ADMIN ||
-			JSON.stringify(project.lead) === JSON.stringify(req.user?._id)
-		)
-	) {
-		throw new CustomError("Not allowed to edit name");
-	}
+	const { project } = req;
 
 	project.name = name;
 	await project.save();
@@ -280,19 +262,7 @@ export const changeProjectName = asyncHander(async (req, res) => {
  **************************************************/
 
 export const approveTask = asyncHander(async (req, res) => {
-	const project = await Project.findOne({ "tasks._id": req.params?.tid });
-	if (!project) {
-		throw new UnexpectedError("Unable to approve task");
-	}
-
-	if (
-		!(
-			req.user?.role === AuthRole.ADMIN ||
-			JSON.stringify(project.lead) === JSON.stringify(req.user?._id)
-		)
-	) {
-		throw new CustomError("Not authorized to approve task", 401);
-	}
+	const { project } = req;
 
 	project.tasks.forEach((task) => {
 		if (
