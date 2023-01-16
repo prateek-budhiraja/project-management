@@ -22,6 +22,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const exportProjects = asyncHandler(async (_req, res) => {
 	const projects = await Project.find();
+	if (!projects) {
+		throw new UnexpectedError("Unable to export projects");
+	}
 
 	const csv = json2csv.parse(projects);
 	if (!csv) {
@@ -48,6 +51,50 @@ export const exportProjects = asyncHandler(async (_req, res) => {
 				fs.unlinkSync(filePath); // delete this file after 3 minutes
 			}, 60000);
 			return res.download("public/projects-" + date + ".csv");
+		}
+	});
+});
+
+/**************************************************
+ * @EXPORT_USERS
+ * @REQUEST_TYPE GET
+ * @route http://localhost:<PORT>/api/admin/export/users
+ * @description Export Users
+ * @parameters
+ * @returns
+ **************************************************/
+
+export const exportUsers = asyncHandler(async (_req, res) => {
+	const users = await User.find();
+	if (!users) {
+		throw new UnexpectedError("Unable to export users");
+	}
+
+	const csv = json2csv.parse(users);
+	if (!csv) {
+		throw new UnexpectedError("Unable to export projects");
+	}
+
+	let date = new Date();
+	date = `${date.getDate()}-${
+		date.getMonth() + 1
+	}-${date.getFullYear()}-${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
+
+	const filePath = path.join(
+		__dirname,
+		"..",
+		"public",
+		"users-" + date + ".csv"
+	);
+
+	fs.writeFile(filePath, csv, (err) => {
+		if (err) {
+			throw new UnexpectedError("Unable to export projects");
+		} else {
+			setTimeout(function () {
+				fs.unlinkSync(filePath); // delete this file after 3 minutes
+			}, 60000);
+			return res.download("public/users-" + date + ".csv");
 		}
 	});
 });
