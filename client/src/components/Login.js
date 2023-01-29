@@ -13,13 +13,15 @@ export default function Login() {
 			.post("/auth/login", { email, password })
 			.then((result) => {
 				if (result?.data.success) {
+					console.log(result.data.user);
+					localStorage.setItem("user", JSON.stringify(result.data.user));
 					navigate("/dashboard");
 				} else {
 					toast.error("Something went wrong!");
 				}
 			})
 			.catch(({ response }) =>
-				toast.error(response.data.message || "Something went wrong!")
+				toast.error(response?.data.message || "Something went wrong!")
 			);
 		setEmail("");
 		setPassword("");
