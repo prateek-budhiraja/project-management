@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { router as productRouter } from "./route/project.route.js";
 import { router as authRouter } from "./route/auth.route.js";
 import { router as adminRouter } from "./route/admin.route.js";
+import cors from "cors";
 
 const app = express();
 
@@ -13,6 +14,7 @@ dbConnect();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors());
 
 app.use("/api", productRouter);
 app.use("/api/auth", authRouter);
