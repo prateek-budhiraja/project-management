@@ -11,10 +11,9 @@ export default function Login() {
 		const result = await axios.post("/auth/login", { email, password });
 		setEmail("");
 		setPassword("");
-		console.log(result);
-		// if(result.success) {
-
-		// }
+		if (result?.data.success) {
+			navigate("/dashboard");
+		}
 	};
 
 	return (
