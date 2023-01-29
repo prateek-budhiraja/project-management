@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Login() {
 	const [email, setEmail] = useState("");
@@ -8,16 +9,36 @@ export default function Login() {
 	const navigate = useNavigate();
 	const handleLogin = async (e) => {
 		e.preventDefault();
-		const result = await axios.post("/auth/login", { email, password });
+		await axios
+			.post("/auth/login", { email, password })
+			.then((result) => {
+				if (result?.data.success) {
+					navigate("/dashboard");
+				} else {
+					toast.error("Something went wrong!");
+				}
+			})
+			.catch(({ response }) =>
+				toast.error(response.data.message || "Something went wrong!")
+			);
 		setEmail("");
 		setPassword("");
-		if (result?.data.success) {
-			navigate("/dashboard");
-		}
 	};
 
 	return (
 		<section className="bg-gray-50">
+			<ToastContainer
+				position="top-center"
+				autoClose={5000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+			/>
 			<div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
 				<h1 className="mb-6 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
 					Sign in to your account
