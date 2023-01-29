@@ -14,7 +14,13 @@ dbConnect();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+		credentials: true,
+	})
+);
 
 app.use("/api", productRouter);
 app.use("/api/auth", authRouter);
