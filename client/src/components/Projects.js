@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import Project from "./Project";
 
 export default function Projects() {
 	const [userProjects, setUserProjects] = useState([]);
@@ -14,7 +15,7 @@ export default function Projects() {
 	return (
 		<>
 			{userProjects.map((project) => (
-				<p key={project._id}>{project.name}</p>
+				<Project project={project} key={project._id} />
 			))}
 		</>
 	);
