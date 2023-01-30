@@ -1,11 +1,27 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Task({ task }) {
 	const [selected, setSelected] = useState(task.status);
-	const handleStatusChange = async (e, tid) => {
-		setSelected(e.target.value);
-		await axios.patch(`/task/${tid}/status`);
+	const handleStatusChange = async (e) => {
+		const status = e.target.value;
+		await axios
+			.patch(`/task/${task._id}/status`, {
+				status,
+			})
+			.then((result) => {
+				console.log(result);
+				if (!result?.data.success) {
+					console.log("in if");
+					toast.error(result.data.message);
+				} else {
+					console.log("in else");
+					setSelected(status);
+					toast.success("State changed successfully");
+				}
+			})
+			.catch((err) => toast.error(err.response.data.message));
 	};
 	return (
 		<div className="flex justify-between mb-2">
