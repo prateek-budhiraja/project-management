@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AddProject from "./AddProject";
 import Header from "./Header";
 import Projects from "./Projects";
 
@@ -22,7 +21,6 @@ export default function Home() {
 	return (
 		<>
 			<Header user={user} />
-			<AddProject />
 			<Projects />
 		</>
 	);

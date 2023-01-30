@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
-export default function AddProject() {
+export default function AddProject({ fetchData }) {
 	const [showModal, setShowModal] = useState(false);
 	const [name, setName] = useState("");
 	const handleAddProject = async (name) => {
@@ -9,7 +10,13 @@ export default function AddProject() {
 			.post("/project/create", {
 				name,
 			})
-			.then(window.location.reload(false));
+			.then(() => {
+				fetchData();
+				toast.success("Project added successfully");
+			})
+			.catch((err) =>
+				toast.error(err?.response?.data?.message || "Something went wrong")
+			);
 	};
 	return (
 		<div className="px-6 py-4 flex justify-between items-center">

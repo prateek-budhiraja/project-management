@@ -2,14 +2,21 @@ import axios from "axios";
 import React from "react";
 import AddTask from "./AddTask";
 import Tasks from "./Tasks";
+import { toast } from "react-toastify";
 
-export default function Project({ project, setUserProjects }) {
+export default function Project({ project, fetchData }) {
 	const handleAddTask = async (pid, name) => {
 		await axios
 			.patch(`/project/${pid}/task/add`, {
 				name,
 			})
-			.then(window.location.reload(false));
+			.then(() => {
+				fetchData();
+				toast.success("Task added successfully");
+			})
+			.catch((err) =>
+				toast.error(err?.response?.data?.message || "Something went wrong")
+			);
 	};
 
 	return (
