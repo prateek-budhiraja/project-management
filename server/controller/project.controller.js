@@ -207,7 +207,8 @@ export const changeTaskStatus = asyncHander(async (req, res) => {
 		// );
 		if (
 			JSON.stringify(task.assigned_to) === JSON.stringify(req.user?._id) &&
-			JSON.stringify(req.params?.tid) === JSON.stringify(task._id)
+			JSON.stringify(req.params?.tid) === JSON.stringify(task._id) &&
+			task.status !== "PENDING"
 		) {
 			task.status = status;
 			modified = true;
