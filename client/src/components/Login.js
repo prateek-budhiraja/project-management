@@ -13,7 +13,7 @@ export default function Login() {
 			.post("/auth/login", { email, password })
 			.then((result) => {
 				if (result?.data.success) {
-					console.log(result.data.user);
+					toast.success("Loggedin successful");
 					localStorage.setItem("user", JSON.stringify(result.data.user));
 					navigate("/dashboard");
 				} else {
@@ -29,18 +29,6 @@ export default function Login() {
 
 	return (
 		<section className="bg-gray-50">
-			<ToastContainer
-				position="top-center"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-				theme="light"
-			/>
 			<div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
 				<h1 className="mb-6 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
 					Sign in to your account
