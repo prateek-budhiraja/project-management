@@ -23,6 +23,10 @@ const projectSchema = mongoose.Schema({
 				ref: "User",
 				required: false,
 			},
+			email: {
+				type: String,
+				required: true,
+			},
 			status: {
 				type: String,
 				enum: Object.values(TaskStatus),

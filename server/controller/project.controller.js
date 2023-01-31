@@ -67,6 +67,7 @@ export const addTask = asyncHander(async (req, res) => {
 	const task = {
 		name,
 		assigned_to: req.user,
+		email: req.user.email,
 		status: TaskStatus.PENDING,
 	};
 
@@ -118,6 +119,7 @@ export const assignTask = asyncHander(async (req, res) => {
 	project.tasks.forEach((task) => {
 		if (JSON.stringify(task._id) === JSON.stringify(req.params.tid)) {
 			task.assigned_to = assigned_to;
+			task.email = email;
 		}
 	});
 
@@ -208,7 +210,7 @@ export const changeTaskStatus = asyncHander(async (req, res) => {
 		if (
 			JSON.stringify(task.assigned_to) === JSON.stringify(req.user?._id) &&
 			JSON.stringify(req.params?.tid) === JSON.stringify(task._id) &&
-			task.status !== "PENDING"
+			task.status !== TaskStatus.PENDING
 		) {
 			task.status = status;
 			modified = true;
