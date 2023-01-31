@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Admin from "./Admin";
 import Header from "./Header";
+import Lead from "./Lead";
 import Projects from "./Projects";
 
 export default function Home() {
+	const [component, setComponent] = useState("DASHBOARD");
 	const [user, setUser] = useState(null);
 	const navigate = useNavigate();
 	useEffect(() => {
@@ -20,8 +23,14 @@ export default function Home() {
 
 	return (
 		<>
-			<Header user={user} />
-			<Projects />
+			<Header user={user} component={component} setComponent={setComponent} />
+			{component === "ADMIN" ? (
+				<Admin />
+			) : component === "LEAD" ? (
+				<Lead />
+			) : (
+				<Projects />
+			)}
 		</>
 	);
 }
