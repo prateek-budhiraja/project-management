@@ -207,7 +207,7 @@ export const logout = (req, res) => {
  * @GET_ALL_USERS
  * @REQUEST_TYPE GET
  * @route http://localhost:<PORT>/api/auth/users
- * @description Logout user
+ * @description Get all users
  * @parameters
  * @returns Message
  **************************************************/
@@ -220,6 +220,26 @@ export const users = asyncHandler(async (_req, res) => {
 	res.status(200).json({
 		success: true,
 		users,
+	});
+});
+
+/**************************************************
+ * @GET_A_USER
+ * @REQUEST_TYPE GET
+ * @route http://localhost:<PORT>/api/auth/users/:uid
+ * @description Get a user
+ * @parameters
+ * @returns User
+ **************************************************/
+
+export const user = asyncHandler(async (req, res) => {
+	const user = await User.findById(req.params.uid);
+	if (!user) {
+		throw new UnexpectedError("Unable to fetch user data");
+	}
+	res.status(200).json({
+		success: true,
+		user,
 	});
 });
 

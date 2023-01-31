@@ -8,6 +8,7 @@ import {
 	signup,
 	updatePassword,
 	updateRole,
+	user,
 	users,
 } from "../controller/auth.controller.js";
 import { isAdmin, isLoggedIn } from "../middleware/auth.middleware.js";
@@ -22,5 +23,6 @@ router.patch("/update/password/:uid", isLoggedIn, isAdmin, updatePassword);
 router.delete("/delete/:uid", isLoggedIn, isAdmin, deleteUser);
 router.post("/logout", isLoggedIn, logout);
 router.get("/users", isLoggedIn, isAdmin, users);
+router.get("/user/:uid", user);
 
 export { router };
