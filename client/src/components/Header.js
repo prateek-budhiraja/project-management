@@ -2,7 +2,7 @@ import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Header({ user }) {
+export default function Header({ user, setComponent, component }) {
 	const navigate = useNavigate();
 
 	const handleSignout = async () => {
@@ -19,9 +19,21 @@ export default function Header({ user }) {
 			<div className="flex lg:gap-6 gap-2">
 				<p className="text-gray-600">{user?.email}</p>
 				{user?.role === "ADMIN" ? (
-					<a href="admin">Admin View</a>
+					<button
+						onClick={() =>
+							setComponent(component === "DASHBOARD" ? "ADMIN" : "DASHBOARD")
+						}
+					>
+						{component === "ADMIN" ? "DASHBOARD" : "Admin View"}
+					</button>
 				) : user?.role === "LEAD" ? (
-					<a href="lead">Lead View</a>
+					<button
+						onClick={() =>
+							setComponent(component === "DASHBOARD" ? "LEAD" : "DASHBOARD")
+						}
+					>
+						{component === "LEAD" ? "DASHBOARD" : "Lead View"}
+					</button>
 				) : (
 					""
 				)}
