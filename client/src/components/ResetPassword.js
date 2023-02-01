@@ -4,7 +4,7 @@ export default function ResetPassword({ handleChangePassword, user }) {
 	const [showModal, setShowModal] = useState(false);
 	const [password, setPassword] = useState("");
 	return (
-		<div>
+		<div className="ml-auto">
 			<button
 				onClick={() => setShowModal(true)}
 				className="text-blue-600 text-right"
