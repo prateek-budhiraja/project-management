@@ -92,9 +92,9 @@ export const signup = asyncHandler(async (req, res) => {
 
 	user.password = undefined;
 
-	const token = await user.getJwtToken();
+	// const token = await user.getJwtToken();
 
-	res.cookie("token", token, options);
+	// res.cookie("token", token, options);
 
 	res.status(201).json({
 		success: true,
