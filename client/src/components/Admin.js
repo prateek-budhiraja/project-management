@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import AddUser from "./AddUser";
 import Lead from "./Lead";
 import Users from "./Users";
 
@@ -68,7 +69,7 @@ export default function Admin() {
 				</div>
 				<div>
 					<h2 className="text-xl font-semibold pt-4 text-center mb-5">
-						User Management
+						User Management <AddUser />
 					</h2>
 					<Users />
 				</div>

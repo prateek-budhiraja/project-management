@@ -25,28 +25,41 @@ export default function Users() {
 			.catch(() => toast.error("Something went wrong"));
 	};
 
+	const handleRoleChange = async (uid, e) => {
+		const role = e.target.value;
+		await axios
+			.patch(`/auth/update/role/${uid}`, {
+				role,
+			})
+			.then((result) =>
+				result.data.success
+					? toast.success("Role changed successfully")
+					: toast.error(result.data.message || "ERROR")
+			)
+			.catch(() => toast.error("Something went wrong"));
+		setUsers([]);
+	};
+
 	const handleDelete = async (uid) => {
 		console.log("in handle delete");
-		await axios
-			.delete(`/auth/delete/${uid}`)
-			.then((result) => console.log(result));
+		await axios.delete(`/auth/delete/${uid}`);
 	};
 
 	useEffect(() => {
 		fetchUsers();
-	}, []);
+	}, [users]);
 
 	return (
 		<>
 			{users.map((user) => (
-				<div className="grid grid-cols-4">
+				<div className="grid grid-cols-4" key={user._id}>
 					<h2>{user.email}</h2>
 					<select
 						value={user.role}
 						id="status"
 						name="status"
 						className="border-2 border-black rounded-lg"
-						// onChange={handleRoleChange}
+						onChange={(e) => handleRoleChange(user._id, e)}
 					>
 						<option value="USER">USER</option>
 						<option value="LEAD">LEAD</option>
@@ -55,9 +68,10 @@ export default function Users() {
 					<ResetPassword
 						handleChangePassword={handleChangePassword}
 						user={user}
+						key={user._id}
 					/>
 					<button
-						onClick={() => handleDelete(user._id)}
+						onClick={(e) => handleDelete(user._id, e)}
 						className="text-red-600 text-right"
 					>
 						DELETE
