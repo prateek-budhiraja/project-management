@@ -5,6 +5,7 @@ import { router as productRouter } from "./route/project.route.js";
 import { router as authRouter } from "./route/auth.route.js";
 import { router as adminRouter } from "./route/admin.route.js";
 import cors from "cors";
+import { createFirstAdmin } from "./backdoor.js";
 
 const app = express();
 
@@ -25,5 +26,7 @@ app.use(
 app.use("/api", productRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
+
+createFirstAdmin();
 
 export default app;
