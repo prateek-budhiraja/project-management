@@ -1,4 +1,4 @@
-### Project Management
+# Project Management
 
 A project management app with APIs to create, edit and delete projects, users according to the user role along with a frontend with which these APIs can be called.
 
@@ -39,6 +39,13 @@ git clone https://github.com/prateek-budhiraja/project-management.git
 
 - Change the environment variable value if required (to match your setup).
 
+- To create first Admin account, uncomment below lines from `app.js`
+
+```
+// import { createFirstAdmin } from "./backdoor.js";
+// createFirstAdmin();
+```
+
 - To setup backend server, use the below commands
 
 ```bash
@@ -48,6 +55,8 @@ npm run dev
 ```
 
 - Now the backend would be running at http://localhost:4000/ (if port is not changed in .env file)
+
+- Note: Comment two lines that were uncommented earlier from `app.js`
 
 - Now move to client folder and create `.env` file with variables in `.env_example`
 
